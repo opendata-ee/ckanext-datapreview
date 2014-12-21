@@ -7,10 +7,12 @@ import ckan.model as model
 from ckan.lib.base import (BaseController, c, request, response, abort)
 from ckanext.dgu.plugins_toolkit import NotAuthorized
 from ckan.logic import check_access
+from ckan.logic import get_action
 from ckanext.archiver.model import Archival
 from ckanext.qa.model import QA
 
 log = logging.getLogger('ckanext.datapreview')
+
 
 from ckanext.datapreview.lib.helpers import (proxy_query,
                                              identify_resource,
@@ -31,8 +33,10 @@ class DataPreviewController(BaseController):
         context = {'model': model,
                    'session': model.Session,
                    'user': c.user}
+
+        resource_dict = None
         try:
-            check_access("resource_show", context, {'id': resource.id})
+            resource_dict = get_action('resource_show')(context, {'id': resource.id})
         except NotAuthorized, e:
             abort(403, "You are not permitted access to this resource")
 
@@ -90,6 +94,9 @@ class DataPreviewController(BaseController):
         '''
         from requests.exceptions import InvalidURL
 
+        log.info('***> The resoure: %r', resource);
+        log.info('***> The resoure URL: %s', resource.url);
+
         url = None
         archived = False
         query['mimetype'] = None
@@ -145,6 +152,8 @@ class DataPreviewController(BaseController):
             except InvalidURL:
                 log.error("Unable to fix the URL for resource: %s" % identify_resource(resource))
                 return None, False
+
+            log.info('***> fixed URL: %s', u)
 
             try:
                 req = urllib2.Request(u)
