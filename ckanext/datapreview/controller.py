@@ -67,6 +67,7 @@ class DataPreviewController(BaseController):
                 if resource_dict.has_key('url_type') and resource_dict['url_type'] == 'upload':
                     if resource_dict.has_key('url'):
                         url = resource_dict['url']
+                        resource.url = url
 
         if url:
             try:
@@ -100,9 +101,6 @@ class DataPreviewController(BaseController):
         :param query: dict describing the properties of the data
         '''
         from requests.exceptions import InvalidURL
-
-        log.info('***> The resoure: %r', resource);
-        log.info('***> The resoure URL: %s', resource.url);
 
         url = None
         archived = False
@@ -159,8 +157,6 @@ class DataPreviewController(BaseController):
             except InvalidURL:
                 log.error("Unable to fix the URL for resource: %s" % identify_resource(resource))
                 return None, False
-
-            log.info('***> fixed URL: %s', u)
 
             try:
                 req = urllib2.Request(u)

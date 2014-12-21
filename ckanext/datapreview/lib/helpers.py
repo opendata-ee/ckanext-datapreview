@@ -92,6 +92,15 @@ def get_resource_length(url, resource, required=False, redirects=0):
         length = int(headers['content-length'])
         return length
 
+    if 'content-range' in headers:
+        content_range_str = headers['content-range']
+        idx = content_range_str.index('/')
+        if idx >= 0:
+            length_str = content_range_str[(idx+1):]
+            if length_str:
+                length = int(length_str.strip())
+                return length
+
     if required:
         log.info('No content-length returned for server: %s'
                                 % (url))
