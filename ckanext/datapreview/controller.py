@@ -61,6 +61,13 @@ class DataPreviewController(BaseController):
 
         url, archived = self._get_url(resource, query)
         query['archived'] = archived
+
+        if not url:
+            if resource_dict:
+                if resource_dict.has_key('url_type') and resource_dict['url_type'] == 'upload':
+                    if resource_dict.has_key('url'):
+                        url = resource_dict['url']
+
         if url:
             try:
                 response.content_type = 'application/json'
